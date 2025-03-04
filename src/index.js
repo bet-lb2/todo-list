@@ -1,124 +1,84 @@
 import "./styles.css";
-import { Project } from "./project";
-import { Task } from "./task";
+import { Todo } from "./todo";
 
 const addProjectBtn = document.getElementById("add-project-btn");
-const projects = document.getElementById("projects")
-const addTaskBtn = document.getElementById("add-task-btn");
-const tasks = document.getElementById("tasks");
+const addTodoBtn = document.getElementById("add-todo-btn");
+const projects = document.getElementById("projects");
+const todos = document.getElementById("todos");
 const dialog = document.getElementById("dialog");
 
-let todoList = [];
-let selectedProject;
+let projectsList = [];
 
-function displayProject() {
+function displayProjects() {
     projects.innerHTML = "";
-    todoList.forEach((project, index) => {
+    projectsList = getLocalStorage();
+    projectsList.forEach((project, index) => {
         projects.innerHTML += `
-        <button class="project" data-index="${index}">${project.getProjectName()}<button class="remove-project">X</button></button>`
+        <button class="project" data-index="${index}">${project.name}<button class="remove-project">X</button></button>`
     })
-    // document.querySelectorAll(".project").forEach(project => {
-    //     project.addEventListener("click", (e) => {
-    //         e.target.style.fontWeight = "bold";
-    //     })
-    // })
-    document.querySelectorAll(".remove-project").forEach(button => {
-        button.addEventListener("click", (e) => {
+
+    document.querySelectorAll(".remove-project").forEach(removeBtn => {
+        removeBtn.addEventListener("click", (e) => {
             const index = e.target.parentNode.dataset.index;
-            removeProject(index);
+            projectsList.splice(index, 1);
+            updateLocalStorage();
+            displayProjects();
+        })
+    })
+
+    document.querySelectorAll(".project").forEach(project => {
+        project.addEventListener("click", (e) => {
+            const index = Number(e.target.dataset.index);
+            projectsList.forEach((project, projectListIndex) => {
+                project.isSelected = false;
+                console.log(projectListIndex)
+                if (projectListIndex === index) {
+                    project.isSelected = true;
+                }
+            })
+            console.log(projectsList)
+            updateLocalStorage();
+            displayProjects();
         })
     })
 }
 
-function addNewProject(projectName) {
-    todoList.push(new Project(projectName));
-    displayProject();
+function updateLocalStorage() {
+    localStorage.setItem("projectsList", JSON.stringify(projectsList));
 }
 
-function removeProject(index) {
-    todoList.splice(index, 1);
-    displayProject();
+function getLocalStorage() {
+    return JSON.parse(localStorage.getItem("projectsList"))
 }
 
-// addNewProject("All");
-addNewProject("sample project");
-addNewProject("sample project 2");
-displayProject();
+window.addEventListener("load", () => {
+    if (localStorage.getItem("projectsList")) {
+        projectsList = getLocalStorage();
+        displayProjects();
+    }
+})
 
 addProjectBtn.addEventListener("click", () => {
     dialog.innerHTML = "";
     dialog.innerHTML = `
     <div>
         <label for="project-name">Project Name:</label><br>
-        <input id="project-name">
+        <input id="project-name" type="text">
     </div>
-    <div class="buttons">
+    <div>
         <button id="confirm">Confirm</button>
         <button id="close">Close</button>
-    </div>`;
-    dialog.showModal();
+    </div>`
     document.getElementById("confirm").addEventListener("click", () => {
         const projectName = document.getElementById("project-name").value;
-        if (projectName === "") {
-            alert("Enter your project name.");
-            return;
-        }
-        addNewProject(projectName);
+        projectsList.push({name: projectName, isSelected: false, todos: []});
+        localStorage.clear();
+        updateLocalStorage();
+        displayProjects();
         dialog.close();
     })
     document.getElementById("close").addEventListener("click", () => {
         dialog.close();
     })
-})
-
-addTaskBtn.addEventListener("click", () => {
-    dialog.innerHTML = "";
-    dialog.innerHTML = `
-    <div id="project-name" style="text-align: center;">${todoList[0].getProjectName()}</div>
-    <div>
-        <label for="task-title">Title:<br>
-        <input id="task-title">
-    </div>
-    <div>
-        <label for="task-description">Description:<br>
-        <textarea id="task-description"></textarea>
-    </div>
-    <div>
-        <label for="task-dueDate">Due Date:<br>
-        <input id="task-due-date" type="date">
-    </div>
-    <div>
-        <label for="task-priority">Priority:<br>
-        <select id="task-priority">
-            <option value="low" selected>Low</option>
-            <option value="medium">Medium</option>
-            <option value="hight">High</option>
-        </select>
-    </div>
-    <div class="buttons">
-        <button id="confirm">Confirm</button>
-        <button id="close">Close</button>
-    </div>`;
     dialog.showModal();
-    document.getElementById("confirm").addEventListener("click", () => {
-        const projectName = document.getElementById("project-name").textContent;
-        const taskTitle = document.getElementById("task-title").value;
-        const taskDescription = document.getElementById("task-description").value;
-        const taskDueDate = document.getElementById("task-due-date").value;
-        const taskPriority = document.getElementById("task-priority").value;
-        todoList.forEach(project => {
-            if (project.getProjectName() === projectName) {
-                project.setTasks(new Task(taskTitle, taskDescription, taskDueDate, taskPriority));
-                tasks.innerHTML = "";
-                project.getTasks().forEach(task => {
-                    tasks.innerHTML += `
-                    <button><div>${task.title === "" ? "No title" : task.title}</div><div>${task.dueDate === "" ? "No Date" : task.dueDate}</div></button>`
-                })
-            }
-        })
-        dialog.close();
-    })
-    document.getElementById("close").addEventListener("click", () => {
-        dialog.close();
-    })
 })
