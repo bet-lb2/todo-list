@@ -68,7 +68,9 @@ button:hover {
     padding: 5px 15px;
     width: 100%;
     display: grid;
-    justify-content: start;
+    grid-template-columns: repeat(2, max-content);
+    justify-content: space-between;
+    align-items: center;
 }
 
 #projects button:hover {

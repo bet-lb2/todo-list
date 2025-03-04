@@ -3,6 +3,7 @@ import "./styles.css";
 // import { addNewTask } from "./addNewTodo";
 import { Project } from "./project";
 import { Task } from "./task";
+import { NoEmitOnErrorsPlugin } from "webpack";
 
 const addProjectBtn = document.getElementById("add-project-btn");
 const projects = document.getElementById("projects")
@@ -14,11 +15,23 @@ let todoList = [];
 
 function addNewProject(projectName) {
     const todoListLength = todoList.push(new Project(projectName));
+    const index = todoListLength - 1;
     const button = document.createElement("button");
-    button.textContent = todoList[todoListLength - 1].getProjectName();
+    button.dataset.index = index;
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "x";
+    removeBtn.class = "remove-project";
+    removeBtn.style.display = "none";
+    button.textContent = todoList[index].getProjectName();
+    button.append(removeBtn);
     projects.append(button);
 }
 
+function removeProject(index) {
+
+}
+
+addNewProject("All");
 addNewProject("sample project");
 addNewProject("sample project 2");
 
