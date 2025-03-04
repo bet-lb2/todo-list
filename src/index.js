@@ -13,8 +13,9 @@ function displayProjects() {
     projects.innerHTML = "";
     projectsList = getLocalStorage();
     projectsList.forEach((project, index) => {
+        console.log(project)
         projects.innerHTML += `
-        <button class="project" data-index="${index}">${project.name}<button class="remove-project">X</button></button>`
+        <button class="project" style="${project.isSelected === true ? "border: 1px solid black;" : ""}" data-index="${index}">${project.name}<button class="remove-project">X</button></button>`;
     })
 
     document.querySelectorAll(".remove-project").forEach(removeBtn => {
