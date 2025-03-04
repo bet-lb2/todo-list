@@ -77,6 +77,10 @@ button:hover {
     background-color: #CCCCCC;
 }
 
+#projects button .remove-project:hover {
+    background-color: #aaa;
+}
+
 #content {
     background-color: var(--content-background-color);
     padding: 20px;

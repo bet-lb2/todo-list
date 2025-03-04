@@ -3,7 +3,7 @@ import "./styles.css";
 // import { addNewTask } from "./addNewTodo";
 import { Project } from "./project";
 import { Task } from "./task";
-import { NoEmitOnErrorsPlugin } from "webpack";
+import { enIE } from "date-fns/locale";
 
 const addProjectBtn = document.getElementById("add-project-btn");
 const projects = document.getElementById("projects")
@@ -13,27 +13,35 @@ const dialog = document.getElementById("dialog");
 
 let todoList = [];
 
+function displayProject() {
+    projects.innerHTML = "";
+    console.log(todoList)
+    todoList.forEach((project, index) => {
+        projects.innerHTML += `
+        <button data-index="${index}">${project.getProjectName()}<button class="remove-project">X</button></button>`
+    })
+    document.querySelectorAll(".remove-project").forEach(button => {
+        button.addEventListener("click", (e) => {
+            const index = e.target.parentNode.dataset.index;
+            removeProject(index);
+        })
+    })
+}
+
 function addNewProject(projectName) {
-    const todoListLength = todoList.push(new Project(projectName));
-    const index = todoListLength - 1;
-    const button = document.createElement("button");
-    button.dataset.index = index;
-    const removeBtn = document.createElement("button");
-    removeBtn.textContent = "x";
-    removeBtn.class = "remove-project";
-    removeBtn.style.display = "none";
-    button.textContent = todoList[index].getProjectName();
-    button.append(removeBtn);
-    projects.append(button);
+    todoList.push(new Project(projectName));
+    displayProject();
 }
 
 function removeProject(index) {
-
+    todoList.splice(index, 1);
+    displayProject();
 }
 
 addNewProject("All");
 addNewProject("sample project");
 addNewProject("sample project 2");
+displayProject();
 
 addProjectBtn.addEventListener("click", () => {
     dialog.innerHTML = "";
