@@ -1,9 +1,6 @@
 import "./styles.css";
-// import { addNewProject } from "./addNewProject";
-// import { addNewTask } from "./addNewTodo";
 import { Project } from "./project";
 import { Task } from "./task";
-import { enIE } from "date-fns/locale";
 
 const addProjectBtn = document.getElementById("add-project-btn");
 const projects = document.getElementById("projects")
@@ -12,14 +9,19 @@ const tasks = document.getElementById("tasks");
 const dialog = document.getElementById("dialog");
 
 let todoList = [];
+let selectedProject;
 
 function displayProject() {
     projects.innerHTML = "";
-    console.log(todoList)
     todoList.forEach((project, index) => {
         projects.innerHTML += `
-        <button data-index="${index}">${project.getProjectName()}<button class="remove-project">X</button></button>`
+        <button class="project" data-index="${index}">${project.getProjectName()}<button class="remove-project">X</button></button>`
     })
+    // document.querySelectorAll(".project").forEach(project => {
+    //     project.addEventListener("click", (e) => {
+    //         e.target.style.fontWeight = "bold";
+    //     })
+    // })
     document.querySelectorAll(".remove-project").forEach(button => {
         button.addEventListener("click", (e) => {
             const index = e.target.parentNode.dataset.index;
@@ -38,7 +40,7 @@ function removeProject(index) {
     displayProject();
 }
 
-addNewProject("All");
+// addNewProject("All");
 addNewProject("sample project");
 addNewProject("sample project 2");
 displayProject();
