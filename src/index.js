@@ -38,16 +38,17 @@ function displayProjects() {
             })
             updateLocalStorage();
             displayProjects();
-            // displayTodos(project.todos);
+            displayTodos(projectsList[index].todos);
         })
     })
 }
 
 function displayTodos(todosArr) {
     todos.innerHTML = "";
+    console.log(todosArr)
     todosArr.forEach(todo => {
         todos.innerHTML += `
-        <button>${todo.title}</button>`
+        <button><span>${todo.title}</span><span>${todo.dueDate}</span></button>`
     })
 }
 
@@ -58,7 +59,7 @@ function displayAllTodos() {
             todos.innerHTML += `<div>${project.name}</div>`
             project.todos.forEach(todo => {
                 todos.innerHTML += `
-                <button>${todo.title} ${todo.dueDate} ${todo.priority}</button>`;
+                <button><span>${todo.title}</span><span>${todo.dueDate}</span></button>`;
             })
         })
     }

@@ -98,8 +98,17 @@ button:hover {
     gap: 1rem;
 }
 
+#content #todos div {
+    font-weight: bold;
+    text-align: start;
+    padding: 0 20px;
+}
+
 #content #todos button {
     background-color: transparent;
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    justify-content: space-between;
 }
 
 #content #todos button:hover {
