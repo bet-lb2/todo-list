@@ -1,5 +1,6 @@
 import "./styles.css";
 import { Todo } from "./todo";
+import { Project } from "./project";
 
 const addProjectBtn = document.getElementById("add-project-btn");
 const addTodoBtn = document.getElementById("add-todo-btn");
@@ -9,12 +10,31 @@ const dialog = document.getElementById("dialog");
 
 let projectsList = [];
 
+function addNewProject(projectName) {
+    projectsList.push(new Project(projectName));
+    updateLocalStorage();
+}
+
+function addNewTodo(projectName, todoTitle, todoDescription = "", todoDueDate = "", todoPriority = "low") {
+    projectsList.forEach(project => {
+        if (project.name === projectName) {
+            project.todos.push(new Todo(todoTitle, todoDescription, todoDueDate, todoPriority));
+        }
+    })
+    updateLocalStorage();
+}
+
+addNewProject("sample project");
+addNewTodo("sample project", "sample todo", "this is sample description about this todo", "2025-02-25", "medium");
+addNewTodo("sample project", "sample todo", "this is sample description about this todo", "2025-02-25", "low");
+addNewTodo("sample project", "sample todo", "this is sample description about this todo", "2025-02-25", "high");
+
 function displayProjects() {
     projects.innerHTML = "";
     projectsList = getLocalStorage();
     projectsList.forEach((project, index) => {
         projects.innerHTML += `
-        <button class="project" style="${project.isSelected === true ? "outline: 1px solid black;" : ""}" data-index="${index}">${project.name}</button>`;
+        <button class="project" style="${project.isSelected === true ? "outline: 1px solid black;" : ""}" data-index="${index}">${project.name}<button class="remove-project">X</button></button>`;
     })
 
     document.querySelectorAll(".remove-project").forEach(removeBtn => {
@@ -51,8 +71,63 @@ function displayTodos(todosArr) {
     todos.innerHTML = "";
     todosArr.forEach((todo, index) => {
         todos.innerHTML += `
-        <button data-index="${index}"><span style="border-left: 3px solid ${todo.priority === "low" ? "green" : todo.priority === "medium" ? "goldenrod" : "red"};">${todo.title}</span><span>${todo.dueDate === "" ? "No Date" : todo.dueDate}<button class="remove-todo">X</button></span></button>`
+        <button class="edit-todo" data-index="${index}"><span style="border-left: 3px solid ${todo.priority === "low" ? "green" : todo.priority === "medium" ? "goldenrod" : "red"};">${todo.title}</span><span>${todo.dueDate === "" ? "No Date" : todo.dueDate}<button class="remove-todo">X</button></span></button>`
     })
+    document.querySelectorAll(".edit-todo").forEach(editTodoBtn => [
+        editTodoBtn.addEventListener("dblclick", (e) => {
+            dialog.innerHTML = "";
+            const selectedTodoIndex = e.target.dataset.index;
+            projectsList.forEach((project, selectedProjectIndex) => {
+                if (project.isSelected === true) {
+                    const selectedTodo = project.todos[selectedTodoIndex];
+                    dialog.innerHTML = `
+                    <div>
+                        <label for="todo-title">Title:</label>
+                        <input type="text" id="todo-title" value="${selectedTodo.title}">
+                    </div>
+                    <div>
+                        <label for="todo-description">Description:</label>
+                        <textarea id="todo-description">${selectedTodo.description}</textarea>
+                    </div>
+                    <div>
+                        <label for="todo-dueDate">Due date:</label>
+                        <input type="date" id="todo-dueDate" value="${selectedTodo.dueDate}">
+                    </div>
+                    <div>
+                        <label for="todo-priority">Priority</label>
+                        <select id="todo-priority" value="${selectedTodo.priority}">
+                            <option value="low" selected>Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button id="confirm">Confirm</button>
+                        <button id="close">Close</button>
+                    </div>`;
+                    dialog.showModal();
+                    document.getElementById("confirm").addEventListener("click", () => {
+                        const todoTitle = document.getElementById("todo-title").value;
+                        const todoDescription = document.getElementById("todo-description").value;
+                        const todoDueDate = document.getElementById("todo-dueDate").value;
+                        const todoPriority = document.getElementById("todo-priority").value;
+                        if (todoTitle === "") {
+                            alert("Please enter your todo title.");
+                            return;
+                        }
+                        projectsList[selectedProjectIndex].todos.splice(selectedTodoIndex, 1, new Todo(todoTitle, todoDescription, todoDueDate, todoPriority));
+                        updateLocalStorage();
+                        displayProjects();
+                        displayTodos(project.todos);
+                        dialog.close();
+                    })
+                    document.getElementById("close").addEventListener("click", () => {
+                        dialog.close();
+                    })
+                }
+            })
+        })
+    ])
     document.querySelectorAll(".remove-todo").forEach(removeTodoBtn => {
         removeTodoBtn.addEventListener("click", (e) => {
             const todoIndex = e.target.parentNode.parentNode.dataset.index;
@@ -120,7 +195,7 @@ addProjectBtn.addEventListener("click", () => {
     </div>`
     document.getElementById("confirm").addEventListener("click", () => {
         const projectName = document.getElementById("project-name").value;
-        projectsList.push({name: projectName, isSelected: false, todos: []});
+        projectsList.push(new Project(projectName));
         localStorage.clear();
         updateLocalStorage();
         displayProjects();
