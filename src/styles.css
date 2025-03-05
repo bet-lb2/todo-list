@@ -113,7 +113,8 @@ button:hover {
 }
 
 #content #todos>button:hover {
-    background-color: #ccc;
+    /* background-color: #ccc; */
+    cursor: auto;
     opacity: 1;
 }
 

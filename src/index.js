@@ -29,6 +29,11 @@ addNewTodo("sample project", "sample todo", "this is sample description about th
 addNewTodo("sample project", "sample todo", "this is sample description about this todo", "2025-02-25", "low");
 addNewTodo("sample project", "sample todo", "this is sample description about this todo", "2025-02-25", "high");
 
+addNewProject("sample project 2");
+addNewTodo("sample project 2", "sample todo", "this is sample description about this todo", "2025-02-25", "medium");
+addNewTodo("sample project 2", "sample todo", "this is sample description about this todo", "2025-02-25", "low");
+addNewTodo("sample project 2", "sample todo", "this is sample description about this todo", "2025-02-25", "high");
+
 function displayProjects() {
     projects.innerHTML = "";
     projectsList = getLocalStorage();
@@ -58,6 +63,7 @@ function displayProjects() {
             })
             updateLocalStorage();
             if (projectsList.every(project => project.isSelected === false)) {
+                displayProjects();
                 displayAllTodos();
                 return;
             }
@@ -149,7 +155,7 @@ function displayAllTodos() {
             todos.innerHTML += `<div>${project.name}</div>`
             project.todos.forEach((todo, index) => {
                 todos.innerHTML += `
-                <button dta-index="${index}"><span style="border-left: 3px solid ${todo.priority === "low" ? "green" : todo.priority === "medium" ? "goldenrod" : "red"};">${todo.title}</span><span>${todo.dueDate === "" ? "No Date" : todo.dueDate}</span></button>`;
+                <button data-index="${index}"><span style="border-left: 3px solid ${todo.priority === "low" ? "green" : todo.priority === "medium" ? "goldenrod" : "red"};">${todo.title}</span><span>${todo.dueDate === "" ? "No Date" : todo.dueDate}</span></button>`;
             })
         })
     }
