@@ -42,15 +42,6 @@ function displayProjects() {
         <button class="project" style="${project.isSelected === true ? "outline: 1px solid black;" : ""}" data-index="${index}">${project.name}<button class="remove-project">X</button></button>`;
     })
 
-    document.querySelectorAll(".remove-project").forEach(removeBtn => {
-        removeBtn.addEventListener("click", (e) => {
-            const index = e.target.parentNode.dataset.index;
-            projectsList.splice(index, 1);
-            updateLocalStorage();
-            displayProjects();
-        })
-    })
-
     document.querySelectorAll(".project").forEach(project => {
         project.addEventListener("click", (e) => {
             const index = Number(e.target.dataset.index);
@@ -71,6 +62,15 @@ function displayProjects() {
             displayTodos(projectsList[index].todos);
         })
     })
+
+    document.querySelectorAll(".remove-project").forEach(removeBtn => {
+        removeBtn.addEventListener("click", (e) => {
+            const index = e.target.parentNode.dataset.index;
+            projectsList.splice(index, 1);
+            updateLocalStorage();
+            displayProjects();
+        })
+    })
 }
 
 function displayTodos(todosArr) {
@@ -79,61 +79,63 @@ function displayTodos(todosArr) {
         todos.innerHTML += `
         <button class="edit-todo" data-index="${index}"><span style="border-left: 3px solid ${todo.priority === "low" ? "green" : todo.priority === "medium" ? "goldenrod" : "red"};">${todo.title}</span><span>${todo.dueDate === "" ? "No Date" : todo.dueDate}<button class="remove-todo">X</button></span></button>`
     })
-    document.querySelectorAll(".edit-todo").forEach(editTodoBtn => [
+    document.querySelectorAll(".edit-todo").forEach(editTodoBtn => {
         editTodoBtn.addEventListener("dblclick", (e) => {
-            dialog.innerHTML = "";
-            const selectedTodoIndex = e.target.dataset.index;
-            projectsList.forEach((project, selectedProjectIndex) => {
-                if (project.isSelected === true) {
-                    const selectedTodo = project.todos[selectedTodoIndex];
-                    dialog.innerHTML = `
-                    <div>
-                        <label for="todo-title">Title:</label>
-                        <input type="text" id="todo-title" value="${selectedTodo.title}">
-                    </div>
-                    <div>
-                        <label for="todo-description">Description:</label>
-                        <textarea id="todo-description">${selectedTodo.description}</textarea>
-                    </div>
-                    <div>
-                        <label for="todo-dueDate">Due date:</label>
-                        <input type="date" id="todo-dueDate" value="${selectedTodo.dueDate}">
-                    </div>
-                    <div>
-                        <label for="todo-priority">Priority</label>
-                        <select id="todo-priority" value="${selectedTodo.priority}">
-                            <option value="low" selected>Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                        </select>
-                    </div>
-                    <div>
-                        <button id="confirm">Confirm</button>
-                        <button id="close">Close</button>
-                    </div>`;
-                    dialog.showModal();
-                    document.getElementById("confirm").addEventListener("click", () => {
-                        const todoTitle = document.getElementById("todo-title").value;
-                        const todoDescription = document.getElementById("todo-description").value;
-                        const todoDueDate = document.getElementById("todo-dueDate").value;
-                        const todoPriority = document.getElementById("todo-priority").value;
-                        if (todoTitle === "") {
-                            alert("Please enter your todo title.");
-                            return;
-                        }
-                        projectsList[selectedProjectIndex].todos.splice(selectedTodoIndex, 1, new Todo(todoTitle, todoDescription, todoDueDate, todoPriority));
-                        updateLocalStorage();
-                        displayProjects();
-                        displayTodos(project.todos);
-                        dialog.close();
-                    })
-                    document.getElementById("close").addEventListener("click", () => {
-                        dialog.close();
-                    })
-                }
-            })
+            if (e.target.classList[0] === "edit-todo") {
+                dialog.innerHTML = "";
+                const selectedTodoIndex = e.target.dataset.index;
+                projectsList.forEach((project, selectedProjectIndex) => {
+                    if (project.isSelected === true) {
+                        const selectedTodo = project.todos[selectedTodoIndex];
+                        dialog.innerHTML = `
+                        <div>
+                            <label for="todo-title">Title:</label>
+                            <input type="text" id="todo-title" value="${selectedTodo.title}">
+                        </div>
+                        <div>
+                            <label for="todo-description">Description:</label>
+                            <textarea id="todo-description">${selectedTodo.description}</textarea>
+                        </div>
+                        <div>
+                            <label for="todo-dueDate">Due date:</label>
+                            <input type="date" id="todo-dueDate" value="${selectedTodo.dueDate}">
+                        </div>
+                        <div>
+                            <label for="todo-priority">Priority</label>
+                            <select id="todo-priority" value="${selectedTodo.priority}">
+                                <option value="low" selected>Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div>
+                            <button id="confirm">Confirm</button>
+                            <button id="close">Close</button>
+                        </div>`;
+                        dialog.showModal();
+                        document.getElementById("confirm").addEventListener("click", () => {
+                            const todoTitle = document.getElementById("todo-title").value;
+                            const todoDescription = document.getElementById("todo-description").value;
+                            const todoDueDate = document.getElementById("todo-dueDate").value;
+                            const todoPriority = document.getElementById("todo-priority").value;
+                            if (todoTitle === "") {
+                                alert("Please enter your todo title.");
+                                return;
+                            }
+                            projectsList[selectedProjectIndex].todos.splice(selectedTodoIndex, 1, new Todo(todoTitle, todoDescription, todoDueDate, todoPriority));
+                            updateLocalStorage();
+                            displayProjects();
+                            displayTodos(project.todos);
+                            dialog.close();
+                        })
+                        document.getElementById("close").addEventListener("click", () => {
+                            dialog.close();
+                        })
+                    }
+                })
+            }
         })
-    ])
+    })
     document.querySelectorAll(".remove-todo").forEach(removeTodoBtn => {
         removeTodoBtn.addEventListener("click", (e) => {
             const todoIndex = e.target.parentNode.parentNode.dataset.index;
@@ -155,7 +157,68 @@ function displayAllTodos() {
             todos.innerHTML += `<div>${project.name}</div>`
             project.todos.forEach((todo, index) => {
                 todos.innerHTML += `
-                <button data-index="${index}"><span style="border-left: 3px solid ${todo.priority === "low" ? "green" : todo.priority === "medium" ? "goldenrod" : "red"};">${todo.title}</span><span>${todo.dueDate === "" ? "No Date" : todo.dueDate}</span></button>`;
+                <button class="edit-todo ${project.name}" data-index="${index}"><span style="border-left: 3px solid ${todo.priority === "low" ? "green" : todo.priority === "medium" ? "goldenrod" : "red"};">${todo.title}</span><span>${todo.dueDate === "" ? "No Date" : todo.dueDate}</span></button>`;
+            })
+        })
+
+        document.querySelectorAll(".edit-todo").forEach(editTodoBtn => {
+            editTodoBtn.addEventListener("dblclick", (e) => {
+                if (e.target.classList[0] === "edit-todo") {
+                    dialog.innerHTML = "";
+                    const selectedTodoIndex = e.target.dataset.index;
+                    const projectName = e.target.classList.value.replace("edit-todo ", "");
+                    projectsList.forEach((project, index) => {
+                        if (project.name === projectName) {
+                            const selectedTodo = project.todos[selectedTodoIndex];
+                            const selectedProjectIndex = index;
+                            dialog.innerHTML = `
+                            <div>
+                                <label for="todo-title">Title:</label>
+                                <input type="text" id="todo-title" value="${selectedTodo.title}">
+                            </div>
+                            <div>
+                                <label for="todo-description">Description:</label>
+                                <textarea id="todo-description">${selectedTodo.description}</textarea>
+                            </div>
+                            <div>
+                                <label for="todo-dueDate">Due date:</label>
+                                <input type="date" id="todo-dueDate" value="${selectedTodo.dueDate}">
+                            </div>
+                            <div>
+                                <label for="todo-priority">Priority</label>
+                                <select id="todo-priority" value="${selectedTodo.priority}">
+                                    <option value="low" selected>Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                            <div>
+                                <button id="confirm">Confirm</button>
+                                <button id="close">Close</button>
+                            </div>`;
+                            dialog.showModal();
+                            document.getElementById("confirm").addEventListener("click", () => {
+                                const todoTitle = document.getElementById("todo-title").value;
+                                const todoDescription = document.getElementById("todo-description").value;
+                                const todoDueDate = document.getElementById("todo-dueDate").value;
+                                const todoPriority = document.getElementById("todo-priority").value;
+                                if (todoTitle === "") {
+                                    alert("Please enter your todo title.");
+                                    return;
+                                }
+                                console.log(selectedProjectIndex)
+                                projectsList[selectedProjectIndex].todos.splice(selectedTodoIndex, 1, new Todo(todoTitle, todoDescription, todoDueDate, todoPriority));
+                                updateLocalStorage();
+                                displayProjects();
+                                displayAllTodos();
+                                dialog.close();
+                            })
+                            document.getElementById("close").addEventListener("click", () => {
+                                dialog.close();
+                            })
+                        }
+                    })
+                }
             })
         })
     }
