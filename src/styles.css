@@ -99,8 +99,13 @@ button:hover {
     display: grid;
     gap: 1rem;
 }
+
 dialog[open] :last-child {
     display: grid;
     grid-template-columns: repeat(2, max-content);
     justify-content: space-between;
+}
+
+dialog[open] textarea {
+    width: 100%;
 }

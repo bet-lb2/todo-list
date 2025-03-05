@@ -42,6 +42,14 @@ function displayProjects() {
     })
 }
 
+function displayTodos(todosArr) {
+    todos.innerHTML = "";
+    todosArr.forEach(todo => {
+        todos.innerHTML += `
+        <button>${todo.title}</button>`
+    })
+}
+
 function updateLocalStorage() {
     localStorage.setItem("projectsList", JSON.stringify(projectsList));
 }
@@ -74,6 +82,60 @@ addProjectBtn.addEventListener("click", () => {
         localStorage.clear();
         updateLocalStorage();
         displayProjects();
+        dialog.close();
+    })
+    document.getElementById("close").addEventListener("click", () => {
+        dialog.close();
+    })
+    dialog.showModal();
+})
+
+addTodoBtn.addEventListener("click", () => {
+    if (projectsList.length < 1 ) {
+        alert("Please create new project.");
+        return;
+    }
+    if (!projectsList.some(project => project.isSelected === true)) {
+        alert("Please select project which you want to add todo.");
+        return;
+    }
+    const selectedProject = projectsList.filter(project => project.isSelected === true)[0];
+    dialog.innerHTML = "";
+    dialog.innerHTML = `
+    <div>
+        <label for="todo-title">Title:</label>
+        <input type="text" id="todo-title">
+    </div>
+    <div>
+        <label for="todo-description">Description:</label>
+        <textarea id="todo-description"></textarea>
+    </div>
+    <div>
+        <label for="todo-dueDate">Due date:</label>
+        <input type="date" id="todo-dueDate">
+    </div>
+    <div>
+        <label for="todo-priority">Priority</label>
+        <select id="todo-priority">
+            <option value="low" selected>Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+    </div>
+    <div>
+        <button id="confirm">Confirm</button>
+        <button id="close">Close</button>
+    </div>`
+    
+    document.getElementById("confirm").addEventListener("click", () => {
+        const todoTitle = document.getElementById("todo-title").value;
+        const todoDescription = document.getElementById("todo-description").value;
+        const todoDueDate = document.getElementById("todo-dueDate").value;
+        const todoPriority = document.getElementById("todo-priority").value;
+        selectedProject.todos.push(new Todo(todoTitle, todoDescription, todoDueDate, todoPriority));
+        updateLocalStorage();
+        displayProjects();
+        displayTodos(selectedProject.todos);
         dialog.close();
     })
     document.getElementById("close").addEventListener("click", () => {
