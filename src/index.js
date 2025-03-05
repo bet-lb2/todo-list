@@ -14,7 +14,7 @@ function displayProjects() {
     projectsList = getLocalStorage();
     projectsList.forEach((project, index) => {
         projects.innerHTML += `
-        <button class="project" style="${project.isSelected === true ? "outline: 1px solid black;" : ""}" data-index="${index}">${project.name}<button class="remove-project">X</button></button>`;
+        <button class="project" style="${project.isSelected === true ? "outline: 1px solid black;" : ""}" data-index="${index}">${project.name}</button>`;
     })
 
     document.querySelectorAll(".remove-project").forEach(removeBtn => {
@@ -37,6 +37,10 @@ function displayProjects() {
                 project.isSelected = false;
             })
             updateLocalStorage();
+            if (projectsList.every(project => project.isSelected === false)) {
+                displayAllTodos();
+                return;
+            }
             displayProjects();
             displayTodos(projectsList[index].todos);
         })
@@ -45,10 +49,21 @@ function displayProjects() {
 
 function displayTodos(todosArr) {
     todos.innerHTML = "";
-    console.log(todosArr)
-    todosArr.forEach(todo => {
+    todosArr.forEach((todo, index) => {
         todos.innerHTML += `
-        <button><span>${todo.title}</span><span>${todo.dueDate}</span></button>`
+        <button data-index="${index}"><span style="border-left: 3px solid ${todo.priority === "low" ? "green" : todo.priority === "medium" ? "goldenrod" : "red"};">${todo.title}</span><span>${todo.dueDate === "" ? "No Date" : todo.dueDate}<button class="remove-todo">X</button></span></button>`
+    })
+    document.querySelectorAll(".remove-todo").forEach(removeTodoBtn => {
+        removeTodoBtn.addEventListener("click", (e) => {
+            const todoIndex = e.target.parentNode.parentNode.dataset.index;
+            projectsList.forEach(project => {
+                if (project.isSelected === true) {
+                    project.todos.splice(todoIndex, 1);
+                    updateLocalStorage();
+                    displayTodos(project.todos);
+                }
+            })
+        })
     })
 }
 
@@ -57,9 +72,9 @@ function displayAllTodos() {
         todos.innerHTML = "";
         projectsList.forEach(project => {
             todos.innerHTML += `<div>${project.name}</div>`
-            project.todos.forEach(todo => {
+            project.todos.forEach((todo, index) => {
                 todos.innerHTML += `
-                <button><span>${todo.title}</span><span>${todo.dueDate}</span></button>`;
+                <button dta-index="${index}"><span style="border-left: 3px solid ${todo.priority === "low" ? "green" : todo.priority === "medium" ? "goldenrod" : "red"};">${todo.title}</span><span>${todo.dueDate === "" ? "No Date" : todo.dueDate}</span></button>`;
             })
         })
     }
@@ -152,13 +167,16 @@ addTodoBtn.addEventListener("click", () => {
     <div>
         <button id="confirm">Confirm</button>
         <button id="close">Close</button>
-    </div>`
-    
+    </div>`;
     document.getElementById("confirm").addEventListener("click", () => {
         const todoTitle = document.getElementById("todo-title").value;
         const todoDescription = document.getElementById("todo-description").value;
         const todoDueDate = document.getElementById("todo-dueDate").value;
         const todoPriority = document.getElementById("todo-priority").value;
+        if (todoTitle === "") {
+            alert("Please enter your todo title.");
+            return;
+        }
         selectedProject.todos.push(new Todo(todoTitle, todoDescription, todoDueDate, todoPriority));
         updateLocalStorage();
         displayProjects();
