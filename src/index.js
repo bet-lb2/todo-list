@@ -55,9 +55,11 @@ function displayAllTodos() {
     if (projectsList.every(project => project.isSelected === false)) {
         todos.innerHTML = "";
         projectsList.forEach(project => {
-            const todos = project.todos;
-            todos.innerHTML += `
-            <button>Project Name: ${project.name} ${todos.title}</button>`;
+            todos.innerHTML += `<div>${project.name}</div>`
+            project.todos.forEach(todo => {
+                todos.innerHTML += `
+                <button>${todo.title} ${todo.dueDate} ${todo.priority}</button>`;
+            })
         })
     }
 }
@@ -85,7 +87,7 @@ window.addEventListener("load", () => {
         projectsList = getLocalStorage();
         initializeIsSelected();
         displayProjects();
-        // displayAllTodos();
+        displayAllTodos();
     }
 })
 

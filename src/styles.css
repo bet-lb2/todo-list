@@ -93,6 +93,20 @@ button:hover {
     background-color: var(--content-background-color);
 }
 
+#content #todos {
+    display: grid;
+    gap: 1rem;
+}
+
+#content #todos button {
+    background-color: transparent;
+}
+
+#content #todos button:hover {
+    background-color: #ccc;
+    opacity: 1;
+}
+
 #dialog[open] {
     padding: 1rem;
     margin: auto;
