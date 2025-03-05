@@ -13,9 +13,8 @@ function displayProjects() {
     projects.innerHTML = "";
     projectsList = getLocalStorage();
     projectsList.forEach((project, index) => {
-        console.log(project)
         projects.innerHTML += `
-        <button class="project" style="${project.isSelected === true ? "border: 1px solid black;" : ""}" data-index="${index}">${project.name}<button class="remove-project">X</button></button>`;
+        <button class="project" style="${project.isSelected === true ? "outline: 1px solid black;" : ""}" data-index="${index}">${project.name}<button class="remove-project">X</button></button>`;
     })
 
     document.querySelectorAll(".remove-project").forEach(removeBtn => {
@@ -31,13 +30,12 @@ function displayProjects() {
         project.addEventListener("click", (e) => {
             const index = Number(e.target.dataset.index);
             projectsList.forEach((project, projectListIndex) => {
-                project.isSelected = false;
-                console.log(projectListIndex)
                 if (projectListIndex === index) {
-                    project.isSelected = true;
+                    project.isSelected = project.isSelected === true ? false : true;
+                    return;
                 }
+                project.isSelected = false;
             })
-            console.log(projectsList)
             updateLocalStorage();
             displayProjects();
         })
