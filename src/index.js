@@ -38,6 +38,7 @@ function displayProjects() {
             })
             updateLocalStorage();
             displayProjects();
+            // displayTodos(project.todos);
         })
     })
 }
@@ -48,6 +49,27 @@ function displayTodos(todosArr) {
         todos.innerHTML += `
         <button>${todo.title}</button>`
     })
+}
+
+function displayAllTodos() {
+    if (projectsList.every(project => project.isSelected === false)) {
+        todos.innerHTML = "";
+        projectsList.forEach(project => {
+            const todos = project.todos;
+            todos.innerHTML += `
+            <button>Project Name: ${project.name} ${todos.title}</button>`;
+        })
+    }
+}
+
+function initializeIsSelected() {
+    projectsList = projectsList.map(project => {
+        return {
+            ...project,
+            isSelected: false
+        }
+    })
+    updateLocalStorage();
 }
 
 function updateLocalStorage() {
@@ -61,7 +83,9 @@ function getLocalStorage() {
 window.addEventListener("load", () => {
     if (localStorage.getItem("projectsList")) {
         projectsList = getLocalStorage();
+        initializeIsSelected();
         displayProjects();
+        // displayAllTodos();
     }
 })
 
